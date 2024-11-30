@@ -12,6 +12,6 @@ export class User {
   @Column()
   encryptedPassword: string;
 
-  @Column({ type: 'text' }) // تغيير النوع إلى نص
+  @Column({ type: 'text' })
   encryptedBalance: string;
 }
