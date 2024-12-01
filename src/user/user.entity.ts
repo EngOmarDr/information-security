@@ -12,6 +12,6 @@ export class User {
   @Column()
   encryptedPassword: string;
 
-  @Column({ type: 'text' })
+  @Column({ type: 'text' ,  nullable: true })
   encryptedBalance: string;
 }
