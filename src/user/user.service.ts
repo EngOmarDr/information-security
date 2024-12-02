@@ -3,50 +3,21 @@ import { Injectable } from '@nestjs/common';
 import { Repository } from 'typeorm';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
-import * as crypto from 'crypto';
-import NodeRSA from 'node-rsa';
+import * as fs from 'fs';
+import { EncryptionService } from './encryption.service';
 
 @Injectable()
 export class UserService {
-  private readonly symmetricKey = '12345678901234567890123456789012'; // 32 حرفًا
-  private readonly algorithm = 'aes-256-cbc';
-
-  private readonly serverKey = new NodeRSA({ b: 512 }); // توليد مفتاح الخادم
-  private readonly serverPublicKey = this.serverKey.exportKey('public');
-  private readonly serverPrivateKey = this.serverKey.exportKey('private');
+  private readonly serverPublicKey: string;
+  private readonly serverPrivateKey: string;
 
   constructor(
     @InjectRepository(User)
     private readonly userRepository: Repository<User>,
-  ) {}
-
-  // تشفير متناظر
-  private symmetricEncrypt(data: string): string {
-    const cipher = crypto.createCipheriv(
-      this.algorithm,
-      this.symmetricKey,
-      Buffer.alloc(16, 0),
-    );
-    return cipher.update(data, 'utf8', 'hex') + cipher.final('hex');
-  }
-
-  private symmetricDecrypt(data: string): string {
-    const decipher = crypto.createDecipheriv(
-      this.algorithm,
-      this.symmetricKey,
-      Buffer.alloc(16, 0),
-    );
-    return decipher.update(data, 'hex', 'utf8') + decipher.final('utf8');
-  }
-
-  // تشفير غير متناظر
-  public asymmetricEncrypt(data: string, clientPublicKey: string): string {
-    const clientKey = new NodeRSA(clientPublicKey);
-    return clientKey.encrypt(data, 'base64');
-  }
-
-  public asymmetricDecrypt(data: string): string {
-    return this.serverKey.decrypt(data, 'utf8');
+    private readonly encryptionService: EncryptionService
+  ) {
+    this.serverPublicKey = fs.readFileSync('public.pem', { encoding: 'utf8' })
+    this.serverPrivateKey = fs.readFileSync('private.pem', { encoding: 'utf8' })
   }
 
   // استرجاع المفتاح العام للخادم
@@ -54,45 +25,60 @@ export class UserService {
     return this.serverPublicKey;
   }
 
-  async createUser(username: string, password: string): Promise<User> {
+  async createUser(username: string, password: string, publicKey: string): Promise<User> {
+    // save user in database with symmetric encrypt
     const user = new User();
     user.username = username;
-    user.encryptedPassword = this.symmetricEncrypt(password);
-    user.encryptedBalance = this.symmetricEncrypt('0'); // البداية برصيد 0
+    user.encryptedPassword = this.encryptionService.symmetricEncrypt(password);
+    user.encryptedBalance = this.encryptionService.symmetricEncrypt('0'); // البداية برصيد 0
+    user.publicKey = publicKey
     return this.userRepository.save(user);
   }
 
-  async login(username: string, password: string): Promise<User | null> {
+  async login(username: string, password: string, publicKey: string): Promise<User | null> {
     const user = await this.userRepository.findOne({ where: { username } });
     if (!user) return null;
 
-    const decryptedPassword = this.symmetricDecrypt(user.encryptedPassword);
+    const decryptedPassword = this.encryptionService.symmetricDecrypt(user.encryptedPassword);
     if (decryptedPassword !== password) return null;
+
+    user.publicKey = publicKey;
+    this.userRepository.save(user)
 
     return user;
   }
 
-  async deposit(userId: number, amount: number): Promise<void> {
+  async deposit(userId: number, amount: string): Promise<String> {
+    const deAmount = parseFloat(this.encryptionService.asymmetricDecrypt(amount))
+
     const user = await this.userRepository.findOneBy({ id: userId });
-    const balance = parseFloat(this.symmetricDecrypt(user.encryptedBalance));
-    const newBalance = balance + amount;
-    user.encryptedBalance = this.symmetricEncrypt(newBalance.toString());
+    const balance = parseFloat(this.encryptionService.symmetricDecrypt(user.encryptedBalance));
+    const newBalance = balance + deAmount;
+    user.encryptedBalance = this.encryptionService.symmetricEncrypt(newBalance.toString());
     await this.userRepository.save(user);
+
+    return this.encryptionService.asymmetricEncrypt(newBalance.toString(), user.publicKey)
   }
 
-  async withdraw(userId: number, amount: number): Promise<boolean> {
-    const user = await this.userRepository.findOneBy({ id: userId });
-    const balance = parseFloat(this.symmetricDecrypt(user.encryptedBalance));
-    if (balance < amount) return false;
+  async withdraw(userId: number, amount: string): Promise<Object> {
+    const deAmount = parseFloat(this.encryptionService.asymmetricDecrypt(amount))
 
-    const newBalance = balance - amount;
-    user.encryptedBalance = this.symmetricEncrypt(newBalance.toString());
+    const user = await this.userRepository.findOneBy({ id: userId });
+    const balance = parseFloat(this.encryptionService.symmetricDecrypt(user.encryptedBalance));
+    if (balance < deAmount) return false;
+
+    const newBalance = balance - deAmount;
+    user.encryptedBalance = this.encryptionService.symmetricEncrypt(newBalance.toString());
     await this.userRepository.save(user);
-    return true;
+
+    return {messae: 'Withdrawal successful'};
   }
 
   async getBalance(userId: number): Promise<string> {
     const user = await this.userRepository.findOneBy({ id: userId });
-    return this.symmetricDecrypt(user.encryptedBalance);
+    const balance = this.encryptionService.symmetricDecrypt(user.encryptedBalance)
+    
+    const balanceAsy= this.encryptionService.asymmetricEncrypt(balance,user.publicKey)
+    return balanceAsy;
   }
 }

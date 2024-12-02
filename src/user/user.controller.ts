@@ -1,10 +1,11 @@
 /* eslint-disable prettier/prettier */
 import { Controller, Post, Body, Get } from '@nestjs/common';
 import { UserService } from './user.service';
+import { EncryptionService } from './encryption.service';
 
 @Controller('user')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly userService: UserService, private readonly encryptionService: EncryptionService) { }
 
   @Get('public-key')
   getServerPublicKey() {
@@ -12,57 +13,44 @@ export class UserController {
   }
 
   @Post('create')
-  async createUser(@Body() { username, password }: { username: string; password: string }) {
-    const user = await this.userService.createUser(username, password);
-    return { message: 'User created successfully', userId: user.id };
+  async createUser(@Body() { username, password, publicKey }: { username: string; password: string, publicKey: string }) {
+    const user = await this.userService.createUser(username, password, publicKey);
+    return { message: 'User created successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey };
   }
 
   @Post('login')
   async login(
-    @Body() { username, password, clientPublicKey }: { username: string; password: string; clientPublicKey: string },
+    @Body() { username, password, publicKey }: { username: string; password: string; publicKey: string },
   ) {
-    const user = await this.userService.login(username, password);
+    const user = await this.userService.login(username, password, publicKey);
     if (!user) return { message: 'Invalid credentials' };
 
-    const encryptedResponse = this.userService.asymmetricEncrypt(
-      JSON.stringify({ message: 'Login successful', userId: user.id }),
-      clientPublicKey,
-    );
+    return { message: 'Login successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey };
 
-    return { encryptedResponse };
   }
 
   @Post('deposit')
   async deposit(
-    @Body() { userId, amount, clientPublicKey }: { userId: number; amount: number; clientPublicKey: string },
+    @Body() { userId, amount }: { userId: number; amount: string; },
   ) {
-    await this.userService.deposit(userId, amount);
-    const encryptedResponse = this.userService.asymmetricEncrypt(
-      'Deposit successful',
-      clientPublicKey,
-    );
-    return { encryptedResponse };
+    const newBalance = await this.userService.deposit(userId, amount);
+    return { newBalance };
   }
 
   @Post('withdraw')
   async withdraw(
-    @Body() { userId, amount, clientPublicKey }: { userId: number; amount: number; clientPublicKey: string },
+    @Body() { userId, amount }: { userId: number; amount: string; },
   ) {
-    const success = await this.userService.withdraw(userId, amount);
-    const encryptedResponse = this.userService.asymmetricEncrypt(
-      success ? 'Withdrawal successful' : 'Insufficient balance',
-      clientPublicKey,
-    );
-    return { encryptedResponse };
+    const res = await this.userService.withdraw(userId, amount);
+    return res;
   }
 
   @Post('balance')
   async getBalance(
-    @Body() body: { userId: number; clientPublicKey: string }
+    @Body() body: { userId: number; }
   ) {
-    const { userId, clientPublicKey } = body;
+    const { userId } = body;
     const balance = await this.userService.getBalance(userId);
-    const encryptedResponse = this.userService.asymmetricEncrypt(balance, clientPublicKey);
-    return { encryptedResponse };
+    return balance;
   }
 }
