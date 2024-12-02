@@ -9,7 +9,6 @@ import { EncryptionService } from './encryption.service';
 @Injectable()
 export class UserService {
   private readonly serverPublicKey: string;
-  private readonly serverPrivateKey: string;
 
   constructor(
     @InjectRepository(User)
@@ -17,7 +16,6 @@ export class UserService {
     private readonly encryptionService: EncryptionService
   ) {
     this.serverPublicKey = fs.readFileSync('public.pem', { encoding: 'utf8' })
-    this.serverPrivateKey = fs.readFileSync('private.pem', { encoding: 'utf8' })
   }
 
   // استرجاع المفتاح العام للخادم
@@ -48,37 +46,43 @@ export class UserService {
     return user;
   }
 
-  async deposit(userId: number, amount: string): Promise<String> {
+  async deposit(userId: number, amount: string): Promise<Object> {
     const deAmount = parseFloat(this.encryptionService.asymmetricDecrypt(amount))
 
     const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      return { message: "user doesn't exist" }
+    }
     const balance = parseFloat(this.encryptionService.symmetricDecrypt(user.encryptedBalance));
     const newBalance = balance + deAmount;
     user.encryptedBalance = this.encryptionService.symmetricEncrypt(newBalance.toString());
     await this.userRepository.save(user);
 
-    return this.encryptionService.asymmetricEncrypt(newBalance.toString(), user.publicKey)
+    return { balance: this.encryptionService.asymmetricEncrypt(newBalance.toString(), user.publicKey) }
   }
 
   async withdraw(userId: number, amount: string): Promise<Object> {
     const deAmount = parseFloat(this.encryptionService.asymmetricDecrypt(amount))
 
     const user = await this.userRepository.findOneBy({ id: userId });
+    if (!user) {
+      return { message: 'user does not exsits' }
+    }
     const balance = parseFloat(this.encryptionService.symmetricDecrypt(user.encryptedBalance));
-    if (balance < deAmount) return false;
+    if (balance < deAmount) return { message: 'no moeny ' };
 
     const newBalance = balance - deAmount;
     user.encryptedBalance = this.encryptionService.symmetricEncrypt(newBalance.toString());
     await this.userRepository.save(user);
 
-    return {messae: 'Withdrawal successful'};
+    return { messae: 'Withdrawal successful' };
   }
 
-  async getBalance(userId: number): Promise<string> {
+  async getBalance(userId: number): Promise<Object> {
     const user = await this.userRepository.findOneBy({ id: userId });
     const balance = this.encryptionService.symmetricDecrypt(user.encryptedBalance)
-    
-    const balanceAsy= this.encryptionService.asymmetricEncrypt(balance,user.publicKey)
-    return balanceAsy;
+
+    const balanceAsy = this.encryptionService.asymmetricEncrypt(balance, user.publicKey)
+    return { balanceAsy };
   }
 }

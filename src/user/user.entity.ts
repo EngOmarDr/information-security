@@ -12,9 +12,9 @@ export class User {
   @Column()
   encryptedPassword: string;
 
-  @Column({ type: 'text' , default: '0' })
+  @Column({ type: 'text' })
   encryptedBalance: string;
 
-  @Column()
+  @Column({type: 'varchar',length:'500'})
   publicKey: string;
 }

@@ -6,6 +6,7 @@ import { UserModule } from './user/user.module';
 
 @Module({
   imports: [
+    /// this is for postgress
     TypeOrmModule.forRoot({
       type: 'postgres',
       host: 'localhost',
@@ -16,6 +17,17 @@ import { UserModule } from './user/user.module';
       entities: [User],
       synchronize: true,
     }),
+    /// this is for mysql don't remove it
+    // TypeOrmModule.forRoot({
+    //   type: 'mysql',
+    //   host: 'localhost',
+    //   port: 3306,
+    //   username: 'root',
+    //   password: '',
+    //   database: 'test',
+    //   entities: [User],
+    //   synchronize: true,
+    // }),
     UserModule,
   ],
 })

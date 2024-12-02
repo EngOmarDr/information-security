@@ -1,20 +1,28 @@
 /* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import * as crypto from 'crypto';
-import { constants, privateDecrypt, publicEncrypt } from 'crypto';
 import * as fs from 'fs';
+import NodeRSA from 'node-rsa';
 
 @Injectable()
 export class EncryptionService {
-    private readonly symmetricKey = '12345678901234567890123456789012';
+    private readonly symmetricKey = 'Qis/hEvZXLSccI70IdGJ+rCZDD/hQuwk';
     private readonly algorithm = 'aes-256-cbc';
-
-    public readonly serverPrivateKey: string;
-    public readonly serverPublicKey: string;
-
+    private readonly serverPrivateKey: NodeRSA;
+    public readonly serverPublicKey: NodeRSA;
+    
     constructor() {
-        this.serverPrivateKey = fs.readFileSync('private.pem', 'utf8')
-        this.serverPublicKey = fs.readFileSync('public.pem', 'utf8')
+        let f =fs.readFileSync('private.pem', 'utf8');
+        this.serverPrivateKey = new NodeRSA(f);
+        this.serverPublicKey = new NodeRSA(fs.readFileSync('public.pem', 'utf8'));
+        
+        if (!fs.existsSync('private.pem') && !fs.existsSync('public.pem')) {
+            const key = new NodeRSA({ b: 2048 });
+            const publicKey = key.exportKey('public')
+            const privateKey = key.exportKey('private')
+            fs.writeFileSync('private.pem', privateKey, 'utf-8')
+            fs.writeFileSync('public.pem', publicKey, 'utf-8')
+        }
     }
 
     // Symmetric encryption (AES)
@@ -37,37 +45,11 @@ export class EncryptionService {
     }
 
     public asymmetricEncrypt(data: string, clientPublicKey: string): string {
-        const encryptedData = publicEncrypt(
-            {
-                key: clientPublicKey,
-                padding: constants.RSA_PKCS1_OAEP_PADDING,
-                oaepHash: "sha1",
-            },
-            Buffer.from(data)
-        );
-        return encryptedData.toString("base64");
+        const localKey = new NodeRSA(clientPublicKey)
+        return localKey.encrypt(data, 'base64')
     }
 
     public asymmetricDecrypt(encryptedData: string): string {
-        const decryptedData = privateDecrypt(
-            {
-                key: this.serverPrivateKey,
-                padding: constants.RSA_PKCS1_OAEP_PADDING,
-                oaepHash: "sha1",
-            },
-            Buffer.from(encryptedData, "base64")
-        );
-        return decryptedData.toString();
-    }
-
-    public encryptWithPublicKey(data: string,clientPublicKey: string): string {
-        const buffer = Buffer.from(data, 'utf8');
-        return crypto.publicEncrypt(clientPublicKey, buffer).toString('base64');
-    }
-
-    public decryptWithPrivateKey(encryptedData: string): string {
-        const buffer = Buffer.from(encryptedData, 'base64');
-        const decrypted = crypto.privateDecrypt(this.serverPrivateKey, buffer);
-        return decrypted.toString('utf8');
+        return this.serverPrivateKey.decrypt(encryptedData, 'utf8');
     }
 }

@@ -15,7 +15,7 @@ export class UserController {
   @Post('create')
   async createUser(@Body() { username, password, publicKey }: { username: string; password: string, publicKey: string }) {
     const user = await this.userService.createUser(username, password, publicKey);
-    return { message: 'User created successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey };
+    return { message: 'User created successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey.exportKey('public') };
   }
 
   @Post('login')
@@ -25,7 +25,7 @@ export class UserController {
     const user = await this.userService.login(username, password, publicKey);
     if (!user) return { message: 'Invalid credentials' };
 
-    return { message: 'Login successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey };
+    return { message: 'Login successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey.exportKey('public') };
 
   }
 
@@ -34,7 +34,7 @@ export class UserController {
     @Body() { userId, amount }: { userId: number; amount: string; },
   ) {
     const newBalance = await this.userService.deposit(userId, amount);
-    return { newBalance };
+    return newBalance ;
   }
 
   @Post('withdraw')
