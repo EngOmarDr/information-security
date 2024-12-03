@@ -9,23 +9,23 @@ export class UserController {
 
   @Get('public-key')
   getServerPublicKey() {
-    return { publicKey: this.userService.getServerPublicKey() };
+    return { publicKey: this.encryptionService.serverPublicKey.exportKey('public') };
   }
 
   @Post('create')
-  async createUser(@Body() { username, password, publicKey }: { username: string; password: string, publicKey: string }) {
-    const user = await this.userService.createUser(username, password, publicKey);
-    return { message: 'User created successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey.exportKey('public') };
+  async createUser(@Body() { encUsername, encPassword, publicKey }: { encUsername: string; encPassword: string, publicKey: string }) {
+    const user = await this.userService.createUser(encUsername, encPassword, publicKey);
+    return { message: 'User created successfully', user: user.id };
   }
 
   @Post('login')
   async login(
-    @Body() { username, password, publicKey }: { username: string; password: string; publicKey: string },
+    @Body() { encUsername, encPassword, publicKey }: { encUsername: string; encPassword: string; publicKey: string },
   ) {
-    const user = await this.userService.login(username, password, publicKey);
+    const user = await this.userService.login(encUsername, encPassword, publicKey);
     if (!user) return { message: 'Invalid credentials' };
 
-    return { message: 'Login successfully', user: user.id, publicKeyServer: this.encryptionService.serverPublicKey.exportKey('public') };
+    return { message: 'Login successfully', user: user.id};
 
   }
 

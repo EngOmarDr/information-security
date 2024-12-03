@@ -23,7 +23,10 @@ export class UserService {
     return this.serverPublicKey;
   }
 
-  async createUser(username: string, password: string, publicKey: string): Promise<User> {
+  async createUser(encUsername: string, encPassword: string, publicKey: string): Promise<User> {
+    const password = this.encryptionService.asymmetricDecrypt(encPassword)
+    const username = this.encryptionService.asymmetricDecrypt(encUsername)
+
     // save user in database with symmetric encrypt
     const user = new User();
     user.username = username;
@@ -33,7 +36,12 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async login(username: string, password: string, publicKey: string): Promise<User | null> {
+  async login(encUsername: string, encPassword: string, publicKey: string): Promise<User | null> {
+    const password = this.encryptionService.asymmetricDecrypt(encPassword)
+    const username = this.encryptionService.asymmetricDecrypt(encUsername)
+      console.log(password);
+      console.log(username);
+      
     const user = await this.userRepository.findOne({ where: { username } });
     if (!user) return null;
 
