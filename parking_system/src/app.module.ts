@@ -1,7 +1,12 @@
 /* eslint-disable prettier/prettier */
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AccountModule } from './account/account.module';
+import { UserModule } from './users/user.module'; // المستخدمون: المرحلة الأولى
+import { ParkingModule } from './parking/parking.module'; // المواقف: المرحلة الثانية
+import { PaymentModule } from './payment/payment.module'; // الدفع: المرحلة الثالثة
+import { ActivityLogModule } from './activity/activity-log.module'; // النشاط: المرحلة الرابعة
+import { CertificateModule } from './certificate/certificate.module'; // الشهادات الرقمية: المرحلة الخامسة
+import { ProfileModule } from './profile/profile.module'; // أمن التطبيق (XSS/SQL Injection): المرحلة السادسة
 
 @Module({
   imports: [
@@ -15,9 +20,12 @@ import { AccountModule } from './account/account.module';
       autoLoadEntities: true,
       synchronize: true,
     }),
-    AccountModule,
+    UserModule,         // إدارة المستخدمين (الموظفين والزوار)
+    ParkingModule,      // إدارة المواقف وحجزها
+    PaymentModule,      // إدارة الدفع والتشفير الهجين
+    ActivityLogModule,     // مراقبة النشاط والتوقيع الرقمي
+    CertificateModule,  // التوثيق بالشهادات الرقمية
+    ProfileModule,     // الحماية من هجمات XSS/SQL Injection
   ],
-  // controllers: [AppController],
-  // providers: [AppService],
 })
 export class AppModule {}
