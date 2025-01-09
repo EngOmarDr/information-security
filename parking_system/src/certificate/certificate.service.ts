@@ -21,13 +21,13 @@ export class CertificateService {
     }).publicKey.export({ type: 'spki', format: 'pem' });
 
     const certificate = this.certificateRepository.create({
-      csr,
-      publicKey,
-      issuedBy: 'TrustedCA', // جهة الإصدار
-      validFrom: new Date(),
-      validTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-      user,
-    });
+        csr,
+        publicKey: publicKey.toString('base64'), // تحويل Buffer إلى string مشفر
+        issuedBy: 'TrustedCA', // جهة الإصدار
+        validFrom: new Date(),
+        validTo: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+        user,
+      });
 
     return this.certificateRepository.save(certificate);
   }

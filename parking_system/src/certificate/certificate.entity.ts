@@ -12,7 +12,7 @@ export class Certificate {
   csr: string; // طلب الشهادة (Certificate Signing Request)
 
   @Column()
-  publicKey: string | Buffer; // المفتاح العام المرتبط بالشهادة
+  publicKey: string; // المفتاح العام المرتبط بالشهادة
 
   @Column()
   issuedBy: string; // الجهة الموثوقة (CA)

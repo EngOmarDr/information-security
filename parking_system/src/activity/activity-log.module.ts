@@ -5,8 +5,8 @@ import { ActivityLogService } from './activity-log.service';
 import { ActivityLogEntity } from './activity-log.entity';
 
 @Module({
-  imports: [TypeOrmModule.forFeature([ActivityLogEntity])],
-  providers: [ActivityLogService],
-  exports: [ActivityLogService],
-})
-export class ActivityLogModule {}
+    imports: [TypeOrmModule.forFeature([ActivityLogEntity])],
+    providers: [ActivityLogService],
+    exports: [ActivityLogService, TypeOrmModule],  // تأكد من تصدير TypeOrmModule أيضًا
+  })
+  export class ActivityLogModule {}
