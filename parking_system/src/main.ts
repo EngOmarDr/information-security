@@ -22,12 +22,8 @@ async function bootstrap() {
     const keyFile = fs.readFileSync(__dirname + '/../key.pem');
     const certFile = fs.readFileSync(__dirname + '/../cert.pem');
 
-    const app = await NestFactory.create(AppModule, {
-      httpsOptions: {
-        key: keyFile,
-        cert: certFile,
-      },
-    });
+    const app = await NestFactory.create(AppModule,
+    );
     // إعداد CSP لمنع XSS
     app.use(
       helmet.contentSecurityPolicy({

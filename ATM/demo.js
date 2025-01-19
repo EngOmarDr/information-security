@@ -44,7 +44,7 @@ const data = JSON.stringify({
 
 const encryptedData = encrypt(data, sessionKey);
 // const encryptedData = decrypt(EncrptedData, sessionKey);
-console.log(encryptedData);
+// console.log(encryptedData);
 
 // const key = new NodeRSA({ b: 512 });
 // console.log(key.exportKey('public'));
@@ -104,8 +104,8 @@ const secret = 'uUs+lrDvYfRyOR9UeBoKbLwk88MOL0W7iWAMkECVmU6mpG8jKNLd5D3aBaq1QnH8
 var encPu = new NodeRSA(pulicKeyServer)
 var dec = new NodeRSA(privateKeyUser)
 
-// const res = encPu.encrypt(Nosecret, 'base64')
-const res = dec.decrypt(secret,'utf8')
+const res = encPu.encrypt(Nosecret, 'base64')
+// const res = dec.decrypt(secret,'utf8')
 
 console.log(res);
 
