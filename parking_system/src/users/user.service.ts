@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -29,8 +30,8 @@ export class UserService {
     return this.userRepository.save(user);
   }
 
-  async validateUser(phoneNumber: string, password: string): Promise<User | null> {
-    const user = await this.userRepository.findOne({ where: { phoneNumber } });
+  async validateUser(fullName: string, password: string): Promise<User | null> {
+    const user = await this.userRepository.findOne({ where: { fullName } });
 
     if (user && (await bcrypt.compare(password, user.password))) {
       return user;

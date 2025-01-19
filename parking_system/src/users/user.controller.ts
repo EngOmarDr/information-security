@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { Controller, Post, Body, BadRequestException, HttpCode } from '@nestjs/common';
 import { UserService } from './user.service';
 
@@ -34,13 +35,13 @@ export class UserController {
   @Post('login')
   @HttpCode(200)
   async login(@Body() body: any) {
-    const { phoneNumber, password } = body;
+    const { fullName, password } = body;
 
-    if (!phoneNumber || !password) {
-      throw new BadRequestException('Phone number and password are required.');
+    if (!fullName || !password) {
+      throw new BadRequestException('fullName and password are required.');
     }
 
-    const user = await this.userService.validateUser(phoneNumber, password);
+    const user = await this.userService.validateUser(fullName, password);
 
     if (!user) {
       throw new BadRequestException('Invalid credentials.');
