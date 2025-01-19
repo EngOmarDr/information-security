@@ -14,14 +14,14 @@ export class PaymentController {
 
   @Post('process')
   async processPayment(@Body() body: any) {
-    const { encryptedSessionKey, encryptedPaymentData } = body;
+    const { encData, id } = body;
 
-    if (!encryptedSessionKey || !encryptedPaymentData) {
-      throw new Error('Encrypted session key and payment data are required.');
+    if (!id || !encData) {
+      throw new Error('Encrypted Data and id are required.');
     }
 
     // معالجة الدفع
-    const paymentResult = await this.paymentService.processPayment(encryptedSessionKey, encryptedPaymentData);
+    const paymentResult = await this.paymentService.processPayment(encData, id);
 
     // توليد توقيع رقمي للبيانات
     const dataToSign = JSON.stringify(paymentResult);

@@ -7,9 +7,11 @@ import { HandshakeController } from './handshake.controller';
 import { ActivityLogService } from '../activity/activity-log.service';
 import { DigitalSignatureService } from '../activity/digitalSignature.service';
 import { ActivityLogModule } from '../activity/activity-log.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
+import { User } from 'src/users/user.entity';
 
 @Module({
-    imports: [ActivityLogModule],
+    imports: [ActivityLogModule,TypeOrmModule.forFeature([User]),],
   controllers: [PaymentController, HandshakeController],
   providers: [PaymentService, EncryptionService, DigitalSignatureService, ActivityLogService],
 })

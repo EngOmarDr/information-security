@@ -35,17 +35,16 @@ function decrypt(encryptedData, sessionKey) {
 }
 
 
-const sessionKey = 'b3e7c5b94db8a8f4cbb7a21d8b83d8f3e58c63e8e29b7b6a02f5d7b8e3d7a4f1';
-const EncrptedData = '00bd4384eb9d8c8e5e2fbd74dcb51009:ffcd1518d5d0ac15abd12e8894661107f081904c63200a259651178e49621add2d097e48235878215720e55d5f5bcd9f3b64bad7b290917a25c28d94bb7fd6f9363c33cbd5448f1bb88448d1d6fd88ef';
+const sessionKey = 'af2606c3b92d68f0efc1da3a887421826eb68c48e94941ed425fd0291bb9bfa4';
+const EncrptedData = '2ce21d85e1340a516ecab1902e16c2fe:4da34d5fc0e2303a48a078956db76d1cfb6c5499a33e';
 const data = JSON.stringify({
-    slotNumber: 1,
-    time: '2025-01-08T12:00:00Z',
-    reservedBy: 'user123',
+    id:1,
+    amount: 1000,
 });
 
-// const encryptedData = encrypt(data, sessionKey);
+const encryptedData = encrypt(data, sessionKey);
 // const encryptedData = decrypt(EncrptedData, sessionKey);
-// console.log(encryptedData);
+console.log(encryptedData);
 
 // const key = new NodeRSA({ b: 512 });
 // console.log(key.exportKey('public'));
@@ -99,14 +98,14 @@ md2CQw1BuwPNt3MOuRdmz7NgdxkJGcmjx/8bRMSOl1Y=
 
 
 
-const Nosecret = '43c70d0e0cc19f45278066f22358c36178d41a69b646cdf2fd532876500eed3e';
-const secret = 'SLD/lbh3p3apLAVOtQJL7TTnub4ccJ4bpYTV3S1pPkIYaSnT74FqwXXg45tyytx5iDZrBA+DeW4+0VoFZKvGVEpZwGehU5dNVrqSw+Iu22H2Q3sc3HoNaaYGVSasfSGzH9mAc0rP0D3ORsNDrrubyMw8hU8kc1+uy+qRjpVmSB2AHtpqmloX4uYEB0oNnZRN8cBgyVBBYuOqJqW/sioHW9t+tPyrP6Ft4DiqUyHNUpmY815lgNB8r8i1apE6gVHD';
+const Nosecret = 'af2606c3b92d68f0efc1da3a887421826eb68c48e94941ed425fd0291bb9bfa4';
+const secret = 'uUs+lrDvYfRyOR9UeBoKbLwk88MOL0W7iWAMkECVmU6mpG8jKNLd5D3aBaq1QnH8/YQjO7ZHWcsu8Zqm+M9UJpdvWC9iIkhBw+REcQRRBw9diCJvPYKQHrZamfmzWhCCRzZ9ojtPR+b2omOIcxTVZmoNmD/QSyrmC3SK9+Avs78Grro4HHk+t9KQUiewr4yktwKEpZeUZjIUzaefXzjtfMZE3xU0cwg9xZ/1K9ylvOO4BsIUCZU9N4yCK2PnwnR6';
 
 var encPu = new NodeRSA(pulicKeyServer)
 var dec = new NodeRSA(privateKeyUser)
 
-const res = encPu.encrypt(Nosecret, 'base64')
-// const res = dec.decrypt(secret,'utf8')
+// const res = encPu.encrypt(Nosecret, 'base64')
+const res = dec.decrypt(secret,'utf8')
 
 console.log(res);
 

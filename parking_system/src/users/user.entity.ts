@@ -21,6 +21,12 @@ export class User {
 
   @Column({ nullable: false })
   password: string;
+  
+  @Column({ nullable: true })
+  publicKey: string;
+  
+  @Column({ nullable: true,type: 'varchar', length: 500  })
+  sessionKey: string;
 
   @CreateDateColumn()
   createdAt: Date;
