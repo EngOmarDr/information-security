@@ -1,14 +1,15 @@
-/* eslint-disable prettier/prettier */
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './user.entity';
 import * as bcrypt from 'bcrypt';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class UserService {
   constructor(
     @InjectRepository(User) private readonly userRepository: Repository<User>,
+    private readonly jwtService: JwtService,
   ) {}
 
   async createUser(data: {
@@ -36,5 +37,10 @@ export class UserService {
     }
 
     return null;
+  }
+
+  async generateToken(user: User): Promise<string> {
+    const payload = { userId: user.id, userType: user.userType };
+    return this.jwtService.sign(payload);
   }
 }

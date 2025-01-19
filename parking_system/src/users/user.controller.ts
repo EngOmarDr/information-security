@@ -1,5 +1,4 @@
-/* eslint-disable prettier/prettier */
-import { Controller, Post, Body, BadRequestException } from '@nestjs/common';
+import { Controller, Post, Body, BadRequestException, HttpCode } from '@nestjs/common';
 import { UserService } from './user.service';
 
 @Controller('users')
@@ -18,16 +17,22 @@ export class UserController {
       throw new BadRequestException('Invalid user type.');
     }
 
-    return this.userService.createUser({
+    const user = await this.userService.createUser({
       fullName,
       userType,
       phoneNumber,
       carPlate,
       password,
     });
+
+    const token = await this.userService.generateToken(user);
+    
+
+    return { message: 'Registration successful', token };
   }
 
   @Post('login')
+  @HttpCode(200)
   async login(@Body() body: any) {
     const { phoneNumber, password } = body;
 
@@ -41,6 +46,8 @@ export class UserController {
       throw new BadRequestException('Invalid credentials.');
     }
 
-    return { message: 'Login successful', user };
+    const token = await this.userService.generateToken(user);
+
+    return { message: 'Login successful', token };
   }
 }
