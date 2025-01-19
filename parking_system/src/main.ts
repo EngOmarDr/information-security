@@ -9,21 +9,6 @@ const cluster = require('node:cluster');
 const numCPUs = os.cpus().length;
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  // إعداد CSP لمنع XSS
-  app.use(
-    helmet.contentSecurityPolicy({
-      directives: {
-        defaultSrc: ["'self'"],
-        scriptSrc: ["'self'"],
-        objectSrc: ["'none'"],
-        upgradeInsecureRequests: [],
-      },
-    }),
-  );
-
-
   cluster.schedulingPolicy = cluster.SCHED_RR;
 
   if (cluster.isPrimary) {
@@ -34,9 +19,29 @@ async function bootstrap() {
     console.log(`Welcome`);
     console.log(`----------------------------------------`);
   } else {
-    const app = await NestFactory.create(AppModule);
+    const fs = require('fs');
+    const keyFile = fs.readFileSync(__dirname + '/../key.pem');
+    const certFile = fs.readFileSync(__dirname + '/../cert.pem');
+
+    const app = await NestFactory.create(AppModule, {
+      httpsOptions: {
+        key: keyFile,
+        cert: certFile,
+      },
+    });
+    // إعداد CSP لمنع XSS
+    app.use(
+      helmet.contentSecurityPolicy({
+        directives: {
+          defaultSrc: ["'self'"],
+          scriptSrc: ["'self'"],
+          objectSrc: ["'none'"],
+          upgradeInsecureRequests: [],
+        },
+      }),
+    );
+
     await app.listen(process.env.PORT ?? 3000);
   }
-  await app.listen(3000);
 }
 bootstrap();
