@@ -7,6 +7,7 @@ import { HelperService } from 'src/helpers/heper.service';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from 'src/users/user.entity';
 import { Repository } from 'typeorm';
+import { createVerify} from 'crypto';
 
 @Controller('payment')
 export class PaymentController {
@@ -24,9 +25,14 @@ constructor(
     const { encData, id } = body;
     console.log(body);
     const user = await this.userRepository.findOne({where: {id: id} });
-    var is_verified = this.helper.verifySignature(user.publicKey,body.signature,body.data);
-    console.log(is_verified);
 
+    const verify = createVerify('SHA256');
+    const result = verify.verify(user.publicKey, body.signature, 'hex')
+
+    if (!result) {
+      throw new Error('Bad signature');
+    }
+    
     if (!id || !encData) {
       throw new Error('Encrypted Data and id are required.');
     }
