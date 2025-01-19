@@ -7,19 +7,24 @@ export class PaymentService {
   constructor(private readonly encryptionService: EncryptionService) {}
 
   processPayment(encryptedSessionKey: string, encryptedPaymentData: string): any {
+    if (!encryptedSessionKey || !encryptedPaymentData) {
+      throw new Error('Encrypted session key and payment data are required.');
+    }
+  
     // فك تشفير مفتاح الجلسة باستخدام المفتاح الخاص
     const sessionKey = this.encryptionService.decryptWithPrivateKey(encryptedSessionKey);
-
+  
     // فك تشفير بيانات الدفع باستخدام مفتاح الجلسة
     const paymentData = JSON.parse(this.encryptionService.decryptWithAES(encryptedPaymentData, sessionKey));
-
+  
     const { amount, cardNumber, expirationDate } = paymentData;
-
+  
     // معالجة الدفع (محاكاة)
     if (amount > 0) {
       return { success: true, message: 'Payment processed successfully' };
     }
-
+  
     return { success: false, message: 'Invalid payment details' };
   }
+  
 }

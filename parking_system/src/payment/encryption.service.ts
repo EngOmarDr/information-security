@@ -20,14 +20,20 @@ export class EncryptionService {
   }
 
   decryptWithPrivateKey(encryptedData: string): string {
-    return crypto.privateDecrypt(
-      {
-        key: this.rsaKeyPair.privateKey,
-        padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
-      },
-      Buffer.from(encryptedData, 'base64'),
-    ).toString();
+    try {
+      return crypto.privateDecrypt(
+        {
+          key: this.rsaKeyPair.privateKey,
+          padding: crypto.constants.RSA_PKCS1_OAEP_PADDING,
+        },
+        Buffer.from(encryptedData, 'base64'),
+      ).toString();
+    } catch (error) {
+      console.error('Decryption error details:', error);
+      throw new Error('Failed to decrypt session key: ' + error.message);
+    }
   }
+  
 
   encryptWithPublicKey(publicKey: string, data: string): string {
     return crypto.publicEncrypt(

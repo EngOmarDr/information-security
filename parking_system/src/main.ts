@@ -3,7 +3,6 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import * as os from 'os';
 import * as helmet from 'helmet';
-// eslint-disable-next-line @typescript-eslint/no-require-imports
 const cluster = require('node:cluster');
 
 const numCPUs = os.cpus().length;
@@ -44,4 +43,5 @@ async function bootstrap() {
     await app.listen(process.env.PORT ?? 3000);
   }
 }
+
 bootstrap();
