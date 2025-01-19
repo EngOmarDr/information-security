@@ -44,22 +44,14 @@ const data = JSON.stringify({
 });
 
 // const encryptedData = encrypt(data, sessionKey);
-const encryptedData = decrypt(EncrptedData, sessionKey);
-console.log(encryptedData);
+// const encryptedData = decrypt(EncrptedData, sessionKey);
+// console.log(encryptedData);
 
 // const key = new NodeRSA({ b: 512 });
 // console.log(key.exportKey('public'));
 // console.log(key.exportKey('private'));
 
-const pulicKeyServer = `-----BEGIN PUBLIC KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwIXiotvG8rIeTvMLJjYk
-iJzoeDLKS9tZ/fJk7GrCdqdriAa3n+b+MF+5EPbe8qk9bHIMekktRuQIvH9A6Iu3
-HtVQ1lPR99DmvfVUKSfljkdMkMza/rTqNgcTwkze//HMu/adItYaVzAXlw6v7x9R
-KKDGSJ6ZmlDWaXA2pwQfv3Pp8FT4JSC7nIiQrY4bKc4tqbnxdvcdJu6PlNGMTvDf
-XrAR29m006CGt1HuuiQGo5Grd1s8IfRiFnE+0/IfLq07c1lo9qaHuxzPNw8ORD+J
-e0TM+IP/QzAwLsdGfJXHJ1rwdUktx7dlCqVH0v2p1jdYW6s/ru2ambzLTVIa1XnQ
-FwIDAQAB
------END PUBLIC KEY-----`;
+const pulicKeyServer = `-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANH1eXM9VIrl7PQG5m47l4Hgdx4iPOjb\nQWV/67/4kS2o1oKgXuYXqo34fTJszsRCVP+virQOA0xx6p51ucoOBgkCAwEAAQ==\n-----END PUBLIC KEY-----`;
 
 const privateKeyServer = `-----BEGIN RSA PRIVATE KEY-----
 MIIEpAIBAAKCAQEAwIXiotvG8rIeTvMLJjYkiJzoeDLKS9tZ/fJk7GrCdqdriAa3
@@ -95,20 +87,20 @@ MFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBAMXsFwncABrEZ5sut+p8SkqqYQ3FyfvY
 -----END PUBLIC KEY-----`;
 
 const privateKeyUser = `-----BEGIN RSA PRIVATE KEY-----
-MIIBOQIBAAJBAMXsFwncABrEZ5sut+p8SkqqYQ3FyfvY9A1SNS5VHEo2/SYc3AD/
-TlZ2lKF3JmJRtVYo0m4ecYu1ewTlcw6L+SECAwEAAQJANxHguyqOkOQTG9ec7s6U
-cUAE7ysYb03HYil8iJ6/11oF/iXzkUnPjkqRvjwV2ESlKYHW0P7KW2uQAi3tR4PG
-HQIhAPCDPnevRD4IA9Gzqlz4CHGGXu7khFg4K5myfnasfAwTAiEA0qrCZvghAKpm
-zL6wDEcVbVYyh882Z0utjA2R/qaypHsCIAzyg8JdpQbR16LKUTmAALRbz3B8zMMT
-AwXbHgO1dVgRAiACEsYpB0Yj4Il0eGf5JvXyBogmyAZMC/WgTD3kmLVnYwIgd9m3
-fma91lOiAcdDY0ymdwXg+tSJhejcuhiXuP18rPY=
+MIIBPAIBAAJBANH1eXM9VIrl7PQG5m47l4Hgdx4iPOjbQWV/67/4kS2o1oKgXuYX
+qo34fTJszsRCVP+virQOA0xx6p51ucoOBgkCAwEAAQJAOG0dZ8Aq0W17ohWcpjFz
+xV7bBIk1D2ulhq67YAtgkQFbJP9CzZngKSeD7CKZZEByPfRq+G5HQLeCVlUlf+Tb
+AQIhAPuW0kKH769I94MudNhYtYH+3+RO5Q0Xv/fMQsntWy2pAiEA1aPPCz92qVKG
+m5LwZZktS316+Me3YKTGmgBxAK2dkWECIQDUb7O27eWbUrd8kzuierU4wSf4Ng3+
+kjFMYbN7oeo9kQIhAMM2Rz3T462chvspLRjo+oZ8Rh2FAH8CkaauuJMSEWSBAiEA
+md2CQw1BuwPNt3MOuRdmz7NgdxkJGcmjx/8bRMSOl1Y=
 -----END RSA PRIVATE KEY-----`;
 
 
 
 
-const Nosecret = 'test';
-const secret = 'aI0yIQAaWpMrCrkPiviFMk7c3C36aNaSHRDj5646PWgK/84NYksMfIc6Z+soRSysO8QW07cVR1rewvWAHzfeNg==';
+const Nosecret = '43c70d0e0cc19f45278066f22358c36178d41a69b646cdf2fd532876500eed3e';
+const secret = 'SLD/lbh3p3apLAVOtQJL7TTnub4ccJ4bpYTV3S1pPkIYaSnT74FqwXXg45tyytx5iDZrBA+DeW4+0VoFZKvGVEpZwGehU5dNVrqSw+Iu22H2Q3sc3HoNaaYGVSasfSGzH9mAc0rP0D3ORsNDrrubyMw8hU8kc1+uy+qRjpVmSB2AHtpqmloX4uYEB0oNnZRN8cBgyVBBYuOqJqW/sioHW9t+tPyrP6Ft4DiqUyHNUpmY815lgNB8r8i1apE6gVHD';
 
 var encPu = new NodeRSA(pulicKeyServer)
 var dec = new NodeRSA(privateKeyUser)
@@ -116,4 +108,8 @@ var dec = new NodeRSA(privateKeyUser)
 const res = encPu.encrypt(Nosecret, 'base64')
 // const res = dec.decrypt(secret,'utf8')
 
-// console.log(res);
+console.log(res);
+
+// const symmetricKey = crypto.randomBytes(32);
+
+// console.log('Symmetric Key:', symmetricKey.toString('hex'));
