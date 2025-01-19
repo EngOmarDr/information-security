@@ -1,4 +1,51 @@
 const NodeRSA = require('node-rsa')
+const crypto = require('crypto');
+
+function encrypt(data, sessionKey) {
+    const iv = crypto.randomBytes(16);
+    const cipher = crypto.createCipheriv(
+        'aes-256-ctr',
+        Buffer.from(sessionKey, 'hex'),
+        iv,
+    );
+    const encrypted = Buffer.concat([cipher.update(data), cipher.final()]);
+    return `${iv.toString('hex')}:${encrypted.toString('hex')}`;
+}
+
+function decrypt(encryptedData, sessionKey) {
+    const [ivHex, encryptedHex] = encryptedData.split(':');
+
+    // تحقق من أن IV موجود وبالطول الصحيح
+    if (!ivHex || Buffer.from(ivHex, 'hex').length !== 16) {
+        throw new BadRequestException('Invalid or missing initialization vector (IV).');
+    }
+
+    const iv = Buffer.from(ivHex, 'hex');
+    const decipher = crypto.createDecipheriv(
+        'aes-256-ctr',
+        Buffer.from(sessionKey, 'hex'),
+        iv,
+    );
+
+    const decrypted = Buffer.concat([
+        decipher.update(Buffer.from(encryptedHex, 'hex')),
+        decipher.final(),
+    ]);
+    return decrypted.toString();
+}
+
+
+const sessionKey = 'b3e7c5b94db8a8f4cbb7a21d8b83d8f3e58c63e8e29b7b6a02f5d7b8e3d7a4f1';
+const EncrptedData = '00bd4384eb9d8c8e5e2fbd74dcb51009:ffcd1518d5d0ac15abd12e8894661107f081904c63200a259651178e49621add2d097e48235878215720e55d5f5bcd9f3b64bad7b290917a25c28d94bb7fd6f9363c33cbd5448f1bb88448d1d6fd88ef';
+const data = JSON.stringify({
+    slotNumber: 1,
+    time: '2025-01-08T12:00:00Z',
+    reservedBy: 'user123',
+});
+
+// const encryptedData = encrypt(data, sessionKey);
+const encryptedData = decrypt(EncrptedData, sessionKey);
+console.log(encryptedData);
 
 // const key = new NodeRSA({ b: 512 });
 // console.log(key.exportKey('public'));
@@ -66,7 +113,7 @@ const secret = 'aI0yIQAaWpMrCrkPiviFMk7c3C36aNaSHRDj5646PWgK/84NYksMfIc6Z+soRSys
 var encPu = new NodeRSA(pulicKeyServer)
 var dec = new NodeRSA(privateKeyUser)
 
-const res = encPu.encrypt(Nosecret,'base64')
+const res = encPu.encrypt(Nosecret, 'base64')
 // const res = dec.decrypt(secret,'utf8')
 
-console.log(res);
+// console.log(res);
