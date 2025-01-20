@@ -14,14 +14,12 @@ export class ParkingService {
   ) {}
 
   async reserveSlot(encryptedData: string, sessionKey: string): Promise<any> {
-    // فك تشفير البيانات باستخدام المفتاح المتفق عليه
     const decryptedData = JSON.parse(
       this.encryptionService.decrypt(encryptedData, sessionKey),
     );
 
     const { slotNumber, time, reservedBy } = decryptedData;
 
-    // التحقق من البيانات
     const slot = await this.parkingRepository.findOne({ where: { slotNumber } });
 
     if (!slot) {
@@ -32,13 +30,11 @@ export class ParkingService {
       throw new BadRequestException('Parking slot already reserved.');
     }
 
-    // تحديث قاعدة البيانات
     slot.isReserved = true;
     slot.reservedBy = reservedBy;
     slot.reservationTime = new Date(time);
     await this.parkingRepository.save(slot);
 
-    // تشفير الرد
     const response = { message: 'Reservation confirmed', slotNumber, time };
     const encryptedResponse = this.encryptionService.encrypt(
       JSON.stringify(response),
