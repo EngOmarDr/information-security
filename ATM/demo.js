@@ -36,7 +36,7 @@ function decrypt(encryptedData, sessionKey) {
 
 
 const sessionKey = 'af2606c3b92d68f0efc1da3a887421826eb68c48e94941ed425fd0291bb9bfa4';
-const EncrptedData = '2ce21d85e1340a516ecab1902e16c2fe:4da34d5fc0e2303a48a078956db76d1cfb6c5499a33e';
+// const EncrptedData = '2ce21d85e1340a516ecab1902e16c2fe:4da34d5fc0e2303a48a078956db76d1cfb6c5499a33e';
 const data = JSON.stringify({
     id:1,
     amount: 1000,
