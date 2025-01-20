@@ -46,9 +46,9 @@ const encryptedData = encrypt(data, sessionKey);
 // const encryptedData = decrypt(EncrptedData, sessionKey);
 // console.log(encryptedData);
 
-// const key = new NodeRSA({ b: 512 });
-// console.log(key.exportKey('public'));
-// console.log(key.exportKey('private'));
+const key = new NodeRSA({ b: 512 });
+console.log(key.exportKey('public'));
+console.log(key.exportKey('private'));
 
 const pulicKeyServer = `-----BEGIN PUBLIC KEY-----\nMFwwDQYJKoZIhvcNAQEBBQADSwAwSAJBANH1eXM9VIrl7PQG5m47l4Hgdx4iPOjb\nQWV/67/4kS2o1oKgXuYXqo34fTJszsRCVP+virQOA0xx6p51ucoOBgkCAwEAAQ==\n-----END PUBLIC KEY-----`;
 

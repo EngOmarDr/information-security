@@ -25,10 +25,8 @@ constructor(
     const { encData, id } = body;
     console.log(body);
     const user = await this.userRepository.findOne({where: {id: id} });
-
-    const verify = createVerify('SHA256');
-    const result = verify.verify(user.publicKey, body.signature, 'hex')
-
+    const result = this.helper.verifySignature(user.publicKey,body.signature,encData);
+    
     if (!result) {
       throw new Error('Bad signature');
     }

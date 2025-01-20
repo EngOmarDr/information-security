@@ -7,9 +7,11 @@ import * as crypto from 'crypto';
 export class HelperService {
     constructor(    ) { }
 
-    async verifySignature(publicKey, signature, data) : boolean {
+    async verifySignature(publicKey: string, signature: string,data) : Promise<boolean> {
         const verify = crypto.createVerify('SHA256');
-        const result = verify.verify(pulicKeyUser, body.signature, 'hex')
+        verify.update(JSON.stringify(data));
+        verify.end();
+        const result = verify.verify(publicKey, signature, 'hex');
         return result;
     }
 
