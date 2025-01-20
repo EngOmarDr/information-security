@@ -1,16 +1,12 @@
+const { exec, spawn } = require('child_process');
 const fs = require('fs');
-const { execSync } = require('child_process');
-const path = require('path');
 
-const keyPath = path.join(__dirname, 'localhost.key');
-const certPath = path.join(__dirname, 'localhost.crt');
+const generateCertificateWithExistingKey = () => {
+  const opensslCommand = `openssl req -new -key localhost.key -out localhost.csr ; openssl x509 -req -days 365 -in localhost.csr -signkey localhost.key -out localhost.crt`;
+  const child = spawn(opensslCommand,[],{stdio:'pipe'});
+  child.stdout.on('data', (data) => {
+     child.stdin.write('');
+    })
+}
 
-// Generate a self-signed certificate for localhost
-
-
-const generateCertificate = () => {
-  execSync(`openssl req -newkey rsa:2048 -nodes -keyout ${keyPath} -x509 -days 365 -out ${certPath} -subj "/CN=localhost"`);
-  console.log('Self-signed certificate generated successfully!');
-};
-
-generateCertificate();
+generateCertificateWithExistingKey();
