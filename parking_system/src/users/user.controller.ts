@@ -1,10 +1,20 @@
 /* eslint-disable prettier/prettier */
-import { Controller, Post, Body, BadRequestException, HttpCode } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Body,
+  BadRequestException,
+  HttpCode,
+} from '@nestjs/common';
 import { UserService } from './user.service';
+import { DataSource } from 'typeorm';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(
+    private readonly userService: UserService,
+    private readonly dataSource: DataSource,
+  ) {}
 
   @Post('register')
   async register(@Body() body: any) {
@@ -27,7 +37,6 @@ export class UserController {
     });
 
     const token = await this.userService.generateToken(user);
-    
 
     return { message: 'Registration successful', token };
   }
@@ -41,8 +50,16 @@ export class UserController {
       throw new BadRequestException('fullName and password are required.');
     }
 
-    const user = await this.userService.validateUser(fullName, password);
+    // sql injection
+    // const query = `SELECT * FROM users WHERE fullName = '${fullName}' AND password = '${password}'`;
+    // console.log(query);
+    
+    // const result = await this.dataSource.query(query);
+    // const token = await this.userService.generateToken(result[0]);
+    
+    // return { message: 'Login successful', token };
 
+    const user = await this.userService.validateUser(fullName, password);
     if (!user) {
       throw new BadRequestException('Invalid credentials.');
     }
