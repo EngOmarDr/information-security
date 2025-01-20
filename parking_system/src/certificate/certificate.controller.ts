@@ -21,4 +21,22 @@ export class CertificateController {
     const isValid = await this.certificateService.verifyCertificate(csr);
     return isValid ? 'Certificate is valid' : 'Certificate is invalid';
   }
+
+  @Post('sign-example')
+  async postExample(@Body('userId') userId: number) {
+  const user = new User();
+  const keyPair = await crypto.subtle.generateKey( { 
+      name: "RSASSA-PKCS1-v1_5",
+      modulusLength: 2048, 
+      publicExponent: new Uint8Array([1, 0, 1]), 
+      hash: "SHA-256", }, 
+      true, ["sign", "verify"]
+  );
+  const encoder = new TextEncoder(); const dataArray = encoder.encode(null); 
+  const signature = await window.crypto.subtle.sign( { 
+    name: "RSASSA-PKCS1-v1_5", }, 
+    null, dataArray );
+  console.log("sljsljf'slj",keyPair);
+  return `Certificate generated for user ${userId} with CSR: `;
+}
 }

@@ -25,7 +25,7 @@ import { ProfileModule } from './profile/profile.module'; // أمن التطبي
     PaymentModule,      // إدارة الدفع والتشفير الهجين
     ActivityLogModule,     // مراقبة النشاط والتوقيع الرقمي
     CertificateModule,  // التوثيق بالشهادات الرقمية
-    ProfileModule,     // الحماية من هجمات XSS/SQL Injection
+    ProfileModule,  
   ],
 })
 export class AppModule {}
